@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>💕 约会邀约</title>
+    <style>
+        :root {
+            --pink-bg: #FFF5F7;
+            --pink-card: #FFFFFF;
+            --pink-primary: #FFB6C1;
+            --pink-accent: #FF8FAB;
+            --pink-soft: #FFD1DC;
+            --pink-deeper: #FF6B8A;
+            --pink-shadow: rgba(255, 143, 171, 0.25);
+            --text-dark: #5C3D4E;
+            --text-medium: #7A5A6A;
+            --text-light: #A07D8C;
+            --yellow-btn: #FFC107;
+            --yellow-btn-hover: #FFB300;
+            --border-radius: 20px;
+            --transition-speed: 360ms;
+            --font-main: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: var(--font-main);
+            background: var(--pink-bg);
+            touch-action: manipulation;
+        }
+
+        body {
+            position: relative;
+            background: linear-gradient(160deg, #FFF5F7 0%, #FFE8EE 30%, #FFF0F3 60%, #FFE4E9 100%);
+        }
+
+        .floating-hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .floating-hearts span {
+            position: absolute;
+            bottom: -40px;
+            font-size: 20px;
+            opacity: 0.35;
+            animation: floatUp linear infinite;
+        }
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) rotate(0deg) scale(0.6);
+                opacity: 0;
+            }
+            15% {
+                opacity: 0.4;
+            }
+            85% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(-110vh) rotate(360deg) scale(1.1);
+                opacity: 0;
+            }
+        }
+
+        .page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+            padding: 20px;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            opacity: 0;
+            transform: scale(0.97);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .page.active {
+            display: flex;
+            opacity: 1;
+            transform: scale(1);
+            z-index: 2;
+        }
+        .page.fade-out {
+            opacity: 0;
+            transform: scale(1.03);
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 18px;
+            left: 18px;
+            z-index: 50;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255, 255, 255, 0.85);
+            color: var(--pink-deeper);
+            font-size: 22px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 12px var(--pink-shadow);
+            transition: all 0.25s ease;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            touch-action: manipulation;
+        }
+        .back-btn:active {
+            transform: scale(0.9);
+            box-shadow: 0 1px 6px var(--pink-shadow);
+        }
+
+        .card {
+            background: var(--pink-card);
+            border-radius: var(--border-radius);
+            padding: 32px 26px;
+            box-shadow: 0 8px 32px var(--pink-shadow);
+            text-align: center;
+            max-width: 420px;
+            width: 100%;
+            border: 2px solid rgba(255, 209, 220, 0.5);
+            position: relative;
+        }
+
+        .page-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+        .page-subtitle {
+            font-size: 15px;
+            color: var(--text-medium);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 18px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 24px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 5;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 32px;
+            border-radius: 50px;
+            border: none;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            touch-action: manipulation;
+            position: relative;
+            min-height: 52px;
+            min-width: 100px;
+            font-family: var(--font-main);
+        }
+        .btn:active {
+            transform: scale(0.94);
+        }
+
+        .btn-yes {
+            background: linear-gradient(135deg, #FF8FAB, #FF6B8A);
+            color: #fff;
+            box-shadow: 0 6px 20px rgba(255, 107, 138, 0.4);
+            font-size: 18px;
+            padding: 16px 36px;
+        }
+        .btn-yes:active {
+            box-shadow: 0 3px 12px rgba(255, 107, 138, 0.5);
+        }
+
+        .btn-no {
+            background: #fff;
+            color: var(--text-medium);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            border: 2px solid #E8D5DA;
+            padding: 16px 28px;
+        }
+        .btn-no:active {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-no.fixed-mode {
+            position: fixed !important;
+            z-index: 60;
+            padding: 14px 22px;
+            font-size: 15px;
+            min-width: auto;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.15);
+            transition: all var(--transition-speed) cubic-bezier(0.25, 0.8, 0.35, 1);
+            border: 2px solid #E8D5DA;
+            white-space: nowrap;
+        }
+
+        .shy-emoji {
+            font-size: 80px;
+            margin-bottom: 18px;
+            animation: pulse 1.5s ease-in-out infinite;
+            display: block;
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.08);
+            }
+        }
+        .confirm-text {
+            font-size: 18px;
+            color: var(--text-dark);
+            line-height: 1.7;
+            margin-bottom: 24px;
+            font-weight: 500;
+        }
+
+        .btn-continue {
+            background: linear-gradient(135deg, #FFB6C1, #FF8FAB);
+            color: #fff;
+            box-shadow: 0 6px 20px var(--pink-shadow);
+            font-size: 16px;
+            padding: 15px 34px;
+            width: 100%;
+            max-width: 280px;
+        }
+        .btn-continue:active {
+            box-shadow: 0 3px 10px var(--pink-shadow);
+        }
+
+        .datetime-group {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+            width: 100%;
+        }
+        .datetime-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-medium);
+            text-align: left;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+        .datetime-input {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 14px;
+            border: 2px solid #F0D9DF;
+            background: #FFFBFB;
+            font-size: 16px;
+            color: var(--text-dark);
+            font-family: var(--font-main);
+            outline: none;
+            transition: all 0.25s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+            touch-action: manipulation;
+            min-height: 50px;
+        }
+        .datetime-input:focus {
+            border-color: var(--pink-primary);
+            box-shadow: 0 0 0 4px rgba(255, 182, 193, 0.25);
+        }
+        .datetime-input::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            opacity: 0.6;
+        }
+
+        .food-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            width: 100%;
+            max-width: 380px;
+            margin: 0 auto;
+        }
+        .food-option {
+            aspect-ratio: 1 / 1;
+            border-radius: 18px;
+            border: 2.5px solid #F0D9DF;
+            background: #FFFBFB;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+            position: relative;
+            touch-action: manipulation;
+            font-family: var(--font-main);
+            -webkit-user-select: none;
+            user-select: none;
+            padding: 6px;
+        }
+        .food-option:active {
+            transform: scale(0.93);
+        }
+        .food-option .food-emoji {
+            font-size: 36px;
+            pointer-events: none;
+            transition: transform 0.3s ease;
+        }
+        .food-option .food-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-medium);
+            pointer-events: none;
+            letter-spacing: 0.3px;
+        }
+        .food-option.selected {
+            background: #FFF0F3;
+            border-color: var(--pink-deeper);
+            box-shadow: 0 4px 18px var(--pink-shadow);
+            transform: scale(1.03);
+        }
+        .food-option.selected .food-emoji {
+            transform: scale(1.1);
+        }
+        .food-option.selected .food-name {
+            color: var(--pink-deeper);
+        }
+        .food-option .checkmark {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: var(--pink-deeper);
+            color: #fff;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            opacity: 0;
+            transform: scale(0.3);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
+            box-shadow: 0 2px 8px rgba(255, 107, 138, 0.4);
+        }
+        .food-option.selected .checkmark {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .result-heart {
+            font-size: 72px;
+            margin-bottom: 12px;
+            display: block;
+            animation: pulse 1.8s ease-in-out infinite;
+        }
+        .result-summary {
+            background: #FFF8FA;
+            border-radius: 16px;
+            padding: 18px 20px;
+            margin: 16px 0 24px;
+            border: 2px dashed var(--pink-soft);
+            width: 100%;
+            text-align: left;
+        }
+        .result-summary .summary-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 0;
+            font-size: 15px;
+            color: var(--text-dark);
+        }
+        .result-summary .summary-row .summary-icon {
+            font-size: 20px;
+            width: 30px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .result-summary .summary-row .summary-label {
+            font-weight: 600;
+            color: var(--text-medium);
+            min-width: 48px;
+            flex-shrink: 0;
+        }
+        .result-summary .summary-row .summary-value {
+            font-weight: 500;
+            color: var(--pink-deeper);
+        }
+
+        .btn-save-poster {
+            background: linear-gradient(135deg, #FFD54F, #FFC107);
+            color: #6B4F00;
+            box-shadow: 0 6px 22px rgba(255, 193, 7, 0.45);
+            font-size: 17px;
+            padding: 16px 30px;
+            font-weight: 700;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+            touch-action: manipulation;
+            font-family: var(--font-main);
+            min-height: 54px;
+            min-width: 200px;
+        }
+        .btn-save-poster:active {
+            transform: scale(0.94);
+            box-shadow: 0 3px 12px rgba(255, 193, 7, 0.5);
+        }
+
+        .poster-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+        .poster-modal.show {
+            display: flex;
+        }
+        .poster-modal-content {
+            max-width: 90vw;
+            max-height: 85vh;
+            position: relative;
+            background: #fff;
+            border-radius: 18px;
+            padding: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        .poster-modal-content img {
+            max-width: 100%;
+            max-height: 75vh;
+            border-radius: 12px;
+            display: block;
+        }
+        .poster-close-btn {
+            position: absolute;
+            top: -16px;
+            right: -16px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #fff;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-dark);
+            touch-action: manipulation;
+            z-index: 5;
+        }
+        .poster-close-btn:active {
+            transform: scale(0.9);
+        }
+        .poster-download-btn {
+            display: block;
+            margin: 12px auto 0;
+            padding: 12px 28px;
+            border-radius: 30px;
+            border: none;
+            background: var(--yellow-btn);
+            color: #6B4F00;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: var(--font-main);
+            touch-action: manipulation;
+            letter-spacing: 0.5px;
+        }
+        .poster-download-btn:active {
+            transform: scale(0.95);
+        }
+
+        @media (max-width: 420px) {
+            .card {
+                padding: 24px 18px;
+                border-radius: 18px;
+            }
+            .page-title {
+                font-size: 22px;
+            }
+            .btn-yes {
+                font-size: 16px;
+                padding: 14px 28px;
+            }
+            .btn-no {
+                font-size: 15px;
+                padding: 14px 22px;
+            }
+            .food-option .food-emoji {
+                font-size: 28px;
+            }
+            .food-option .food-name {
+                font-size: 11px;
+            }
+            .food-grid {
+                gap: 10px;
+            }
+            .result-heart {
+                font-size: 56px;
+            }
+            .shy-emoji {
+                font-size: 60px;
+            }
+            .back-btn {
+                top: 12px;
+                left: 12px;
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+        }
+        @media (max-width: 360px) {
+            .btn-container {
+                gap: 12px;
+            }
+            .btn-yes {
+                font-size: 14px;
+                padding: 12px 22px;
+                min-width: 80px;
+            }
+            .btn-no {
+                font-size: 13px;
+                padding: 12px 18px;
+                min-width: 70px;
+            }
+            .card {
+                padding: 18px 14px;
+            }
+        }
+        @media (orientation: landscape) and (max-height: 500px) {
+            .card {
+                padding: 16px 20px;
+                max-width: 500px;
+            }
+            .page-title {
+                font-size: 20px;
+            }
+            .shy-emoji,
+            .result-heart {
+                font-size: 40px;
+                margin-bottom: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="floating-hearts" id="floatingHearts"></div>
+
+    <!-- 第1页 -->
+    <div class="page active" id="page1">
+        <button class="back-btn" id="backBtn1" aria-label="返回" style="opacity:0;pointer-events:none;">←</button>
+        <div class="card" id="inviteCard">
+            <div style="font-size:56px;margin-bottom:12px;display:block;">💌</div>
+            <h1 class="page-title">王菲小姐，你愿意和我约会吗？</h1>
+            <p class="page-subtitle">想和王菲小姐一起度过美好的一天 ✨</p>
+            <div class="btn-container" id="btnContainer">
+                <button class="btn btn-yes" id="btnYes">愿意 💕</button>
+                <button class="btn btn-no" id="btnNo">不要</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第2页 -->
+    <div class="page" id="page2">
+        <button class="back-btn" id="backBtn2" aria-label="返回">←</button>
+        <div class="card">
+            <span class="shy-emoji">🥰</span>
+            <h1 class="page-title">太开心了！</h1>
+            <p class="confirm-text">王菲小姐，我就知道你会答应！<br>接下来我们安排一下约会细节吧～</p>
+            <button class="btn btn-continue" id="btnContinue2">继续安排 💖</button>
+        </div>
+    </div>
+
+    <!-- 第3页 -->
+    <div class="page" id="page3">
+        <button class="back-btn" id="backBtn3" aria-label="返回">←</button>
+        <div class="card">
+            <div style="font-size:48px;margin-bottom:10px;display:block;">📅</div>
+            <h1 class="page-title">选个时间吧</h1>
+            <p class="page-subtitle">你什么时候有空呢？</p>
+            <div class="datetime-group">
+                <div>
+                    <div class="datetime-label">📆 日期</div>
+                    <input type="date" class="datetime-input" id="dateInput">
+                </div>
+                <div>
+                    <div class="datetime-label">⏰ 时间</div>
+                    <input type="time" class="datetime-input" id="timeInput" value="18:00">
+                </div>
+            </div>
+            <button class="btn btn-continue" id="btnContinue3">下一步 🍽️</button>
+        </div>
+    </div>
+
+    <!-- 第4页 -->
+    <div class="page" id="page4">
+        <button class="back-btn" id="backBtn4" aria-label="返回">←</button>
+        <div class="card" style="max-width:430px;">
+            <div style="font-size:44px;margin-bottom:8px;display:block;">🍴</div>
+            <h1 class="page-title">想吃什么？</h1>
+            <p class="page-subtitle">选一个你最喜欢的～</p>
+            <div class="food-grid" id="foodGrid">
+                <button class="food-option" data-food="火锅"><span class="food-emoji">🍲</span><span class="food-name">火锅</span><span class="checkmark">✓</span></button>
+                <button class="food-option" data-food="烤肉"><span class="food-emoji">🥩</span><span class="food-name">烤肉</span><span class="checkmark">✓</span></button>
+                <button class="food-option" data-food="寿司"><span class="food-emoji">🍣</span><span class="food-name">寿司</span><span class="checkmark">✓</span></button>
+                <button class="food-option" data-food="日料"><span class="food-emoji">🍱</span><span class="food-name">日料</span><span class="checkmark">✓</span></button>
+                <button class="food-option" data-food="西餐"><span class="food-emoji">🍝</span><span class="food-name">西餐</span><span class="checkmark">✓</span></button>
+                <button class="food-option" data-food="川菜"><span class="food-emoji">🌶️</span><span class="food-name">川菜</span><span class="checkmark">✓</span></button>
+                <button class="food-option" data-food="粤菜"><span class="food-emoji">🥘</span><span class="food-name">粤菜</span><span class="checkmark">✓</span></button>
+                <button class="food-option" data-food="韩餐"><span class="food-emoji">🍖</span><span class="food-name">韩餐</span><span class="checkmark">✓</span></button>
+                <button class="food-option" data-food="甜品"><span class="food-emoji">🍰</span><span class="food-name">甜品</span><span class="checkmark">✓</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第5页 -->
+    <div class="page" id="page5">
+        <button class="back-btn" id="backBtn5" aria-label="返回">←</button>
+        <div class="card">
+            <span class="result-heart">💖</span>
+            <h1 class="page-title">约会安排好啦！</h1>
+            <div class="result-summary" id="resultSummary">
+                <div class="summary-row"><span class="summary-icon">📅</span><span class="summary-label">日期</span><span class="summary-value" id="summaryDate">--</span></div>
+                <div class="summary-row"><span class="summary-icon">⏰</span><span class="summary-label">时间</span><span class="summary-value" id="summaryTime">--</span></div>
+                <div class="summary-row"><span class="summary-icon">🍴</span><span class="summary-label">餐食</span><span class="summary-value" id="summaryFood">--</span></div>
+            </div>
+            <button class="btn-save-poster" id="btnSavePoster">📸 保存海报</button>
+        </div>
+    </div>
+
+    <!-- 海报弹窗 -->
+    <div class="poster-modal" id="posterModal">
+        <div class="poster-modal-content">
+            <button class="poster-close-btn" id="posterCloseBtn">✕</button>
+            <img id="posterImage" src="" alt="约会海报">
+            <button class="poster-download-btn" id="posterDownloadBtn">💾 下载海报</button>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // 工具函数
+            function formatDate(date) {
+                const y = date.getFullYear();
+                const m = String(date.getMonth() + 1).padStart(2, '0');
+                const d = String(date.getDate()).padStart(2, '0');
+                return `${y}-${m}-${d}`;
+            }
+
+            function getToday() {
+                return new Date();
+            }
+
+            function getDayAfterTomorrow() {
+                const d = new Date();
+                d.setDate(d.getDate() + 1);
+                return d;
+            }
+
+            function formatDateChinese(dateStr) {
+                const parts = dateStr.split('-');
+                if (parts.length !== 3) return dateStr;
+                return `${parts[0]}年${parseInt(parts[1])}月${parseInt(parts[2])}日`;
+            }
+
+            function formatTimeChinese(timeStr) {
+                const parts = timeStr.split(':');
+                if (parts.length < 2) return timeStr;
+                const h = parseInt(parts[0]);
+                const m = parts[1];
+                return `${h}:${m}`;
+            }
+
+            // 状态
+            let noBtnClickCount = 0;
+            let noBtnFixed = false;
+            let isAnimating = false;
+            let selectedFood = '';
+            let selectedDate = '';
+            let selectedTime = '18:00';
+            let posterDataUrl = '';
+
+            const noBtnTexts = ['不要', '再想想嘛', '点不到我', '真的不要吗'];
+
+            // DOM元素
+            const page1 = document.getElementById('page1');
+            const page2 = document.getElementById('page2');
+            const page3 = document.getElementById('page3');
+            const page4 = document.getElementById('page4');
+            const page5 = document.getElementById('page5');
+            const btnYes = document.getElementById('btnYes');
+            const btnNo = document.getElementById('btnNo');
+            const btnContainer = document.getElementById('btnContainer');
+            const backBtn1 = document.getElementById('backBtn1');
+            const backBtn2 = document.getElementById('backBtn2');
+            const backBtn3 = document.getElementById('backBtn3');
+            const backBtn4 = document.getElementById('backBtn4');
+            const backBtn5 = document.getElementById('backBtn5');
+            const btnContinue2 = document.getElementById('btnContinue2');
+            const btnContinue3 = document.getElementById('btnContinue3');
+            const dateInput = document.getElementById('dateInput');
+            const timeInput = document.getElementById('timeInput');
+            const foodGrid = document.getElementById('foodGrid');
+            const summaryDate = document.getElementById('summaryDate');
+            const summaryTime = document.getElementById('summaryTime');
+            const summaryFood = document.getElementById('summaryFood');
+            const btnSavePoster = document.getElementById('btnSavePoster');
+            const posterModal = document.getElementById('posterModal');
+            const posterImage = document.getElementById('posterImage');
+            const posterCloseBtn = document.getElementById('posterCloseBtn');
+            const posterDownloadBtn = document.getElementById('posterDownloadBtn');
+
+            // 初始化日期时间
+            function initDateTime() {
+                const today = getToday();
+                const dayAfter = getDayAfterTomorrow();
+                dateInput.min = formatDate(today);
+                dateInput.value = formatDate(dayAfter);
+                selectedDate = dateInput.value;
+                timeInput.value = '18:00';
+                selectedTime = '18:00';
+            }
+
+            // 页面切换
+            function switchPage(fromPage, toPage, direction = 'forward') {
+                if (fromPage === toPage) return;
+                fromPage.classList.add('fade-out');
+                fromPage.classList.remove('active');
+                setTimeout(() => {
+                    fromPage.classList.remove('fade-out');
+                    toPage.classList.add('active');
+                }, 280);
+            }
+
+            // 返回逻辑
+            backBtn2.addEventListener('click', () => switchPage(page2, page1, 'back'));
+            backBtn3.addEventListener('click', () => switchPage(page3, page2, 'back'));
+            backBtn4.addEventListener('click', () => switchPage(page4, page3, 'back'));
+            backBtn5.addEventListener('click', () => switchPage(page5, page4, 'back'));
+            backBtn1.addEventListener('click', resetNoBtn);
+
+            function resetNoBtn() {
+                if (!noBtnFixed) return;
+                noBtnClickCount = 0;
+                noBtnFixed = false;
+                btnNo.classList.remove('fixed-mode');
+                btnNo.textContent = '不要';
+                btnNo.style.position = '';
+                btnNo.style.left = '';
+                btnNo.style.top = '';
+                btnNo.style.right = '';
+                btnNo.style.bottom = '';
+                btnNo.style.transform = '';
+                btnNo.style.zIndex = '';
+                if (btnNo.parentNode !== btnContainer) btnContainer.appendChild(btnNo);
+            }
+
+            // 获取随机位置（避开愿意按钮）
+            function getRandomPosition() {
+                const btnRect = btnNo.getBoundingClientRect();
+                const btnW = btnRect.width;
+                const btnH = btnRect.height;
+                const vw = window.innerWidth;
+                const vh = window.innerHeight;
+                const padding = 10;
+
+                const yesRect = btnYes.getBoundingClientRect();
+                const yesPadding = 12; // 安全间距
+
+                let left, top;
+                let attempts = 0;
+                const maxAttempts = 30;
+
+                do {
+                    left = padding + Math.random() * (vw - btnW - 2 * padding);
+                    top = padding + Math.random() * (vh - btnH - 2 * padding);
+
+                    // 检查是否与愿意按钮重叠
+                    const noRect = {
+                        left: left,
+                        top: top,
+                        right: left + btnW,
+                        bottom: top + btnH
+                    };
+                    const yesSafeRect = {
+                        left: yesRect.left - yesPadding,
+                        top: yesRect.top - yesPadding,
+                        right: yesRect.right + yesPadding,
+                        bottom: yesRect.bottom + yesPadding
+                    };
+
+                    const overlap = !(noRect.right < yesSafeRect.left || noRect.left > yesSafeRect.right ||
+                                      noRect.bottom < yesSafeRect.top || noRect.top > yesSafeRect.bottom);
+                    if (!overlap) break;
+                    attempts++;
+                } while (attempts < maxAttempts);
+
+                // 确保在视口内
+                left = Math.max(padding, Math.min(left, vw - btnW - padding));
+                top = Math.max(padding, Math.min(top, vh - btnH - padding));
+
+                return { left, top };
+            }
+
+            // 移动“不要”按钮到随机位置
+            function moveNoBtnToRandomPosition() {
+                if (!noBtnFixed) return;
+                const pos = getRandomPosition();
+                btnNo.style.left = pos.left + 'px';
+                btnNo.style.top = pos.top + 'px';
+                btnNo.style.right = 'auto';
+                btnNo.style.bottom = 'auto';
+                btnNo.style.transform = 'none';
+            }
+
+            // 处理“不要”按钮点击
+            function handleNoBtnClick(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (isAnimating) return;
+                isAnimating = true;
+
+                // 更新文案
+                noBtnClickCount++;
+                const textIndex = noBtnClickCount % noBtnTexts.length;
+                btnNo.textContent = noBtnTexts[textIndex];
+
+                if (!noBtnFixed) {
+                    // 首次点击：切换到fixed定位
+                    noBtnFixed = true;
+                    btnNo.classList.add('fixed-mode');
+
+                    const rect = btnNo.getBoundingClientRect();
+                    btnNo.style.position = 'fixed';
+                    btnNo.style.left = rect.left + 'px';
+                    btnNo.style.top = rect.top + 'px';
+                    btnNo.style.right = 'auto';
+                    btnNo.style.bottom = 'auto';
+                    btnNo.style.transform = 'none';
+                    btnNo.style.zIndex = '60';
+                    void btnNo.offsetHeight; // 强制reflow
+                }
+
+                // 移动按钮到随机位置
+                moveNoBtnToRandomPosition();
+
+                setTimeout(() => {
+                    isAnimating = false;
+                }, 380);
+            }
+
+            btnNo.addEventListener('click', handleNoBtnClick);
+            btnNo.addEventListener('touchstart', function(e) {}, { passive: true });
+
+            // “愿意”按钮点击（保持不变）
+            btnYes.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (isAnimating) return;
+                switchPage(page1, page2, 'forward');
+            });
+
+            // 继续按钮
+            btnContinue2.addEventListener('click', () => switchPage(page2, page3, 'forward'));
+            btnContinue3.addEventListener('click', () => {
+                const dVal = dateInput.value;
+                const tVal = timeInput.value;
+                if (!dVal) {
+                    alert('请选择一个日期～');
+                    return;
+                }
+                selectedDate = dVal;
+                selectedTime = tVal || '18:00';
+                switchPage(page3, page4, 'forward');
+            });
+
+            // 日期时间变更
+            dateInput.addEventListener('change', function() {
+                selectedDate = this.value;
+                const today = formatDate(getToday());
+                if (this.value < today) {
+                    alert('不能选择过去的日期哦～');
+                    this.value = today;
+                    selectedDate = today;
+                }
+            });
+            timeInput.addEventListener('change', function() {
+                selectedTime = this.value || '18:00';
+            });
+
+            // 餐食选择
+            foodGrid.addEventListener('click', function(e) {
+                const option = e.target.closest('.food-option');
+                if (!option) return;
+                if (isAnimating) return;
+
+                const food = option.dataset.food;
+                selectedFood = food;
+
+                document.querySelectorAll('.food-option').forEach(el => el.classList.remove('selected'));
+                option.classList.add('selected');
+
+                isAnimating = true;
+                setTimeout(() => {
+                    updateSummary();
+                    switchPage(page4, page5, 'forward');
+                    isAnimating = false;
+                }, 450);
+            });
+
+            function updateSummary() {
+                summaryDate.textContent = selectedDate ? formatDateChinese(selectedDate) : '--';
+                summaryTime.textContent = selectedTime ? formatTimeChinese(selectedTime) : '--';
+                summaryFood.textContent = selectedFood || '--';
+            }
+
+            // 海报生成（与上一版完全一致，包含王菲小姐字样）
+            function generatePoster() {
+                const canvas = document.createElement('canvas');
+                canvas.width = 1080;
+                canvas.height = 1440;
+                const ctx = canvas.getContext('2d');
+
+                const bgGrad = ctx.createLinearGradient(0, 0, 0, 1440);
+                bgGrad.addColorStop(0, '#FFF5F7');
+                bgGrad.addColorStop(0.3, '#FFE8EE');
+                bgGrad.addColorStop(0.6, '#FFF0F3');
+                bgGrad.addColorStop(1, '#FFE4E9');
+                ctx.fillStyle = bgGrad;
+                ctx.fillRect(0, 0, 1080, 1440);
+
+                ctx.strokeStyle = 'rgba(255,143,171,0.4)';
+                ctx.lineWidth = 4;
+                ctx.setLineDash([20, 15]);
+                ctx.strokeRect(35, 35, 1010, 1370);
+                ctx.setLineDash([]);
+
+                drawHeart(ctx, 540, 100, 30, '#FFB6C1', 0.6);
+                drawHeart(ctx, 480, 130, 18, '#FFD1DC', 0.5);
+                drawHeart(ctx, 600, 130, 18, '#FFD1DC', 0.5);
+
+                ctx.fillStyle = '#5C3D4E';
+                ctx.font = 'bold 52px "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('💕 致王菲小姐的约会邀请 💕', 540, 210);
+
+                ctx.fillStyle = '#A07D8C';
+                ctx.font = '28px "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif';
+                ctx.fillText('期待与王菲小姐共度美好时光', 540, 280);
+
+                drawHeart(ctx, 540, 540, 180, '#FF8FAB', 1);
+                drawHeart(ctx, 540, 540, 150, '#FFB6C1', 1);
+                ctx.fillStyle = 'rgba(255,255,255,0.3)';
+                ctx.beginPath();
+                ctx.ellipse(490, 480, 35, 25, -0.3, 0, Math.PI * 2);
+                ctx.fill();
+
+                const cardX = 140;
+                const cardY = 760;
+                const cardW = 800;
+                const cardH = 400;
+                const cardRadius = 28;
+                ctx.save();
+                ctx.shadowColor = 'rgba(255,143,171,0.3)';
+                ctx.shadowBlur = 40;
+                ctx.shadowOffsetY = 10;
+                ctx.fillStyle = '#FFFFFF';
+                roundRect(ctx, cardX, cardY, cardW, cardH, cardRadius);
+                ctx.fill();
+                ctx.restore();
+
+                ctx.strokeStyle = 'rgba(255,182,193,0.5)';
+                ctx.lineWidth = 3;
+                roundRect(ctx, cardX, cardY, cardW, cardH, cardRadius);
+                ctx.stroke();
+
+                ctx.fillStyle = '#FF6B8A';
+                ctx.font = 'bold 32px "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('— 约会详情 —', 540, cardY + 60);
+
+                ctx.strokeStyle = '#FFD1DC';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(cardX + 60, cardY + 90);
+                ctx.lineTo(cardX + cardW - 60, cardY + 90);
+                ctx.stroke();
+
+                const infoStartX = cardX + 80;
+                let infoY = cardY + 160;
+                const lineHeight = 55;
+
+                ctx.textAlign = 'left';
+                ctx.font = '28px "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif';
+                ctx.fillStyle = '#7A5A6A';
+                ctx.fillText('📅', infoStartX, infoY);
+                ctx.fillStyle = '#5C3D4E';
+                ctx.font = 'bold 30px "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif';
+                ctx.fillText('日期：', infoStartX + 50, infoY);
+                ctx.fillStyle = '#FF6B8A';
+                ctx.font = '30px "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif';
+                ctx.fillText(selectedDate ? formatDateChinese(selectedDate) : '待定', infoStartX + 160, infoY);
+
+                infoY += lineHeight;
+                ctx.fillStyle = '#7A5A6A';
+                ctx.font = '28px "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif';
+                ctx.fillText('⏰', infoStartX, infoY);
+                ctx.fillStyle = '#5C3D4E';
+                ctx.font = 'bold 30px "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif';
+                ctx.fillText('时间：', infoStartX + 50, infoY);
+                ctx.fillStyle = '#FF6B8A';
+                ctx.font = '30px "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif';
+                ctx.fillText(selectedTime || '18:00', infoStartX + 160, infoY);
+
+                infoY += lineHeight;
+                ctx.fillStyle = '#7A5A6A';
+                ctx.font = '28px "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif';
+                ctx.fillText('🍴', infoStartX, infoY);
+                ctx.fillStyle = '#5C3D4E';
+                ctx.font = 'bold 30px "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif';
+                ctx.fillText('餐食：', infoStartX + 50, infoY);
+                ctx.fillStyle = '#FF6B8A';
+                ctx.font = '30px "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif';
+                ctx.fillText(selectedFood || '待定', infoStartX + 160, infoY);
+
+                drawHeart(ctx, 540, 1280, 22, '#FFB6C1', 0.5);
+                drawHeart(ctx, 500, 1310, 16, '#FFD1DC', 0.4);
+                drawHeart(ctx, 580, 1310, 16, '#FFD1DC', 0.4);
+
+                ctx.fillStyle = '#C49AA6';
+                ctx.font = '22px "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('💕 期待与你相见 💕', 540, 1345);
+
+                return canvas.toDataURL('image/png');
+            }
+
+            function drawHeart(ctx, cx, cy, size, color, alpha) {
+                ctx.save();
+                ctx.globalAlpha = alpha;
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                const s = size;
+                ctx.moveTo(cx, cy + s * 0.6);
+                ctx.bezierCurveTo(cx - s * 1.2, cy - s * 0.1, cx - s * 0.7, cy - s * 1.0, cx, cy - s * 0.3);
+                ctx.bezierCurveTo(cx + s * 0.7, cy - s * 1.0, cx + s * 1.2, cy - s * 0.1, cx, cy + s * 0.6);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            function roundRect(ctx, x, y, w, h, r) {
+                ctx.beginPath();
+                ctx.moveTo(x + r, y);
+                ctx.lineTo(x + w - r, y);
+                ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+                ctx.lineTo(x + w, y + h - r);
+                ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+                ctx.lineTo(x + r, y + h);
+                ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+                ctx.lineTo(x, y + r);
+                ctx.quadraticCurveTo(x, y, x + r, y);
+                ctx.closePath();
+            }
+
+            // 保存海报
+            btnSavePoster.addEventListener('click', function() {
+                updateSummary();
+                posterDataUrl = generatePoster();
+                posterImage.src = posterDataUrl;
+                posterModal.classList.add('show');
+            });
+
+            // 海报弹窗关闭
+            posterCloseBtn.addEventListener('click', function() {
+                posterModal.classList.remove('show');
+            });
+            posterModal.addEventListener('click', function(e) {
+                if (e.target === posterModal) posterModal.classList.remove('show');
+            });
+
+            // 海报下载
+            posterDownloadBtn.addEventListener('click', function() {
+                if (!posterDataUrl) return;
+                const link = document.createElement('a');
+                link.href = posterDataUrl;
+                link.download = '约会海报_' + (selectedDate || 'date') + '.png';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+
+            // 窗口缩放时调整“不要”按钮位置（确保不越界）
+            let resizeTimeout;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(function() {
+                    if (noBtnFixed) {
+                        const btnRect = btnNo.getBoundingClientRect();
+                        const vw = window.innerWidth;
+                        const vh = window.innerHeight;
+                        const padding = 10;
+                        let left = btnRect.left;
+                        let top = btnRect.top;
+                        left = Math.max(padding, Math.min(left, vw - btnRect.width - padding));
+                        top = Math.max(padding, Math.min(top, vh - btnRect.height - padding));
+                        btnNo.style.left = left + 'px';
+                        btnNo.style.top = top + 'px';
+                    }
+                }, 150);
+            });
+
+            // 方向变化处理
+            window.addEventListener('orientationchange', function() {
+                setTimeout(function() {
+                    if (noBtnFixed) {
+                        const btnRect = btnNo.getBoundingClientRect();
+                        const vw = window.innerWidth;
+                        const vh = window.innerHeight;
+                        const padding = 10;
+                        let left = btnRect.left;
+                        let top = btnRect.top;
+                        left = Math.max(padding, Math.min(left, vw - btnRect.width - padding));
+                        top = Math.max(padding, Math.min(top, vh - btnRect.height - padding));
+                        btnNo.style.left = left + 'px';
+                        btnNo.style.top = top + 'px';
+                    }
+                }, 300);
+            });
+
+            // 初始化飘浮爱心
+            function initFloatingHearts() {
+                const container = document.getElementById('floatingHearts');
+                const heartEmojis = ['💕', '💖', '💗', '🩷', '❤️', '🌸'];
+                const count = 15;
+                for (let i = 0; i < count; i++) {
+                    const span = document.createElement('span');
+                    span.textContent = heartEmojis[i % heartEmojis.length];
+                    span.style.left = (Math.random() * 95) + '%';
+                    span.style.fontSize = (14 + Math.random() * 18) + 'px';
+                    span.style.animationDuration = (8 + Math.random() * 14) + 's';
+                    span.style.animationDelay = (Math.random() * 10) + 's';
+                    container.appendChild(span);
+                }
+            }
+
+            function init() {
+                initDateTime();
+                initFloatingHearts();
+                page1.classList.add('active');
+            }
+
+            init();
+
+            document.addEventListener('touchmove', function(e) {
+                if (posterModal.classList.contains('show')) e.preventDefault();
+            }, { passive: false });
+
+            console.log('💕 约会邀约页面已加载完毕！');
+        })();
+    </script>
+</body>
+</html>
